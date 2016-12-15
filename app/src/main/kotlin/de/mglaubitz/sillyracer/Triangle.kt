@@ -1,5 +1,6 @@
 package de.mglaubitz.sillyracer
 
+import android.graphics.Color
 import android.opengl.GLES20
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -9,7 +10,7 @@ import java.nio.FloatBuffer
 class Triangle {
 
     // Set color with red, green, blue and alpha (opacity) values
-    private var color = Color.rgbPartsWithAlpha(Color.RED, 1f)
+    private var color = floatArrayOf(Color.red(Color.RED) / 255f, Color.green(Color.RED) / 255f, Color.blue(Color.RED) / 255f, 1f)
 
     // number of coordinates per vertex in this array
     private val COORDS_PER_VERTEX = 3
@@ -41,8 +42,14 @@ class Triangle {
         }
     }
 
-    fun draw() {
+    fun draw(mvpMatrix: FloatArray) {
         GLES20.glUseProgram(shaderProgram)
+
+        // get handle to shape's transformation matrix
+        val mvpMatrixHandle = GLES20.glGetUniformLocation(shaderProgram, "uMVPMatrix")
+
+        // Pass the projection and view transformation to the shader
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
 
         // get handle to vertex shader's vPosition member
         val positionHandle = GLES20.glGetAttribLocation(shaderProgram, "vPosition")
@@ -90,9 +97,10 @@ class Triangle {
         }
 
         private val vertexShaderCode = """
+            uniform mat4 uMVPMatrix;
             attribute vec4 vPosition;
             void main() {
-                gl_Position = vPosition;
+                gl_Position = uMVPMatrix * vPosition;
             }
         """
 
