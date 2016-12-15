@@ -11,5 +11,4 @@ class SillyRacerView @JvmOverloads constructor(context: Context, attrs: Attribut
         setRenderer(SillyRacerRenderer())
         renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
     }
-
 }
